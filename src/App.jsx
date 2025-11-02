@@ -13,6 +13,7 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [platforms, setPlatforms] = useState({ pc: false, playstation: false, xbox: false });
   const [sortBy, setSortBy] = useState('rating');
+  const [showTable, setShowTable] = useState(false);
 
   const fetchGames = async () => {
     setLoading(true);
@@ -107,7 +108,42 @@ const App = () => {
         />
         {loading && <p aria-live="polite">Loading...</p>}
         {error && <p aria-live="assertive">Error: {error}</p>}
-        <GameGrid games={games} openDetail={openDetail} />
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+          <h2 style={{ margin: 0 }}>Results</h2>
+          <div>
+            <button onClick={() => setShowTable(prev => !prev)} aria-pressed={showTable}>
+              {showTable ? 'Show Cards' : 'Show Table'}
+            </button>
+          </div>
+        </div>
+
+        {showTable ? (
+          <section aria-label="Games Table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Rating</th>
+                  <th>Release</th>
+                </tr>
+              </thead>
+              <tbody>
+                {games.map(g => (
+                  <tr key={g.id} onClick={() => openDetail(g.slug)} style={{ cursor: 'pointer' }} role="button">
+                    <td>{g.id}</td>
+                    <td>{g.name}</td>
+                    <td>{g.rating}</td>
+                    <td>{g.release_date}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        ) : (
+          <GameGrid games={games} openDetail={openDetail} />
+        )}
         {selectedGame && (
           <GameDetail game={selectedGame} onClose={() => setSelectedGame(null)} />
         )}
