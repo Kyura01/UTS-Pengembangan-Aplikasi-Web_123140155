@@ -167,19 +167,47 @@ const App = () => {
         ) : (
           <GameGrid games={games} openDetail={openDetail} />
         )}
-        {/* Pagination controls */}
+        {/* Pagination controls: numbered with sliding window */}
         <nav className="pagination" aria-label="Pagination">
+          <button
+            className="page-btn"
+            onClick={() => setPage(1)}
+            disabled={page <= 1}
+            aria-label="First page"
+          >
+            «
+          </button>
+
           <button
             className="page-btn"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
             aria-label="Previous page"
           >
-            ‹ Prev
+            ‹
           </button>
 
-          <div className="page-list" aria-hidden>
-            Page {page} / {totalPages}
+          <div className="page-list">
+            {(() => {
+              const maxButtons = 7;
+              let start = Math.max(1, page - Math.floor(maxButtons / 2));
+              let end = Math.min(totalPages, start + maxButtons - 1);
+              if (end - start < maxButtons - 1) {
+                start = Math.max(1, end - maxButtons + 1);
+              }
+              const pages = [];
+              for (let i = start; i <= end; i++) pages.push(i);
+              return pages.map((p) => (
+                <button
+                  key={p}
+                  className={`page-btn ${p === page ? 'active' : ''}`}
+                  onClick={() => setPage(p)}
+                  aria-current={p === page ? 'page' : undefined}
+                >
+                  {p}
+                </button>
+              ));
+            })()}
           </div>
 
           <button
@@ -188,7 +216,16 @@ const App = () => {
             disabled={page >= totalPages}
             aria-label="Next page"
           >
-            Next ›
+            ›
+          </button>
+
+          <button
+            className="page-btn"
+            onClick={() => setPage(totalPages)}
+            disabled={page >= totalPages}
+            aria-label="Last page"
+          >
+            »
           </button>
         </nav>
         {selectedGame && (

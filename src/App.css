@@ -125,7 +125,8 @@ table img {
 
 /* Make cards uniform height and allow the cover to grow to fill space */
 .game-card {
-  height: 440px; /* desktop card height */
+  /* responsive card height: min max with viewport-based scaling */
+  height: clamp(340px, 40vw, 520px);
 }
 
 .game-card:focus,
@@ -160,6 +161,22 @@ table img {
 .cover-foreground { height: 44%; max-height: 44%; width: auto; object-fit: contain; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: block; opacity: 0; transform: translateY(6px); transition: opacity 340ms ease, transform 340ms ease; }
 .cover-foreground.loaded { opacity: 1; transform: translateY(0); }
 
+/* Responsive adjustments for foreground image size */
+@media (max-width: 1200px) {
+  .cover-foreground { height: 48%; max-height: 48%; }
+}
+
+@media (max-width: 900px) {
+  .cover-foreground { height: 52%; max-height: 52%; }
+  .game-card { height: clamp(320px, 55vw, 460px); }
+}
+
+@media (max-width: 600px) {
+  .cover-foreground { height: 60%; max-height: 60%; }
+  .game-card { height: auto; }
+}
+.cover-foreground.loaded { opacity: 1; transform: translateY(0); }
+
 /* overlay between blurred bg and foreground to increase contrast */
 .cover-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.35)); z-index: 1; }
 
@@ -167,10 +184,17 @@ table img {
 .img-wrap .skeleton { position: absolute; inset: 0; z-index: 4; }
 
 /* Pagination styles */
-.pagination { display: flex; gap: 1rem; align-items: center; justify-content: center; margin: 1.2rem 0; }
-.page-btn { background: #111; color: #fff; border: 1px solid #222; padding: 0.5rem 0.9rem; border-radius: 8px; cursor: pointer; }
+.pagination { display: flex; gap: 0.6rem; align-items: center; justify-content: center; margin: 1.2rem 0; flex-wrap: wrap; }
+.page-btn { background: transparent; color: #d0d0d0; border: 1px solid transparent; padding: 0.45rem 0.65rem; border-radius: 6px; cursor: pointer; transition: background 160ms ease, color 160ms ease, transform 120ms ease; }
+.page-btn:hover { transform: translateY(-2px); }
+.page-btn.active, .page-btn[aria-current="page"] { background: #2b6df6; color: #fff; border-color: rgba(43,109,246,0.25); box-shadow: 0 8px 20px rgba(43,109,246,0.12); }
 .page-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.page-list { color: #d0d0d0; font-size: 0.95rem; }
+.page-list { display: flex; gap: 0.35rem; align-items: center; }
+
+@media (max-width: 520px) {
+  .page-list { gap: 0.2rem; }
+  .page-btn { padding: 0.35rem 0.5rem; }
+}
 .cover { 
   width: 100%; 
   height: 100%; 
