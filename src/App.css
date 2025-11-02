@@ -156,11 +156,21 @@ table img {
   transform: scale(1.06);
   z-index: 0;
 }
-.cover-foreground-wrap { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; width: 100%; padding: 0.6rem; box-sizing: border-box; }
-.cover-foreground { height: 44%; max-height: 44%; width: auto; object-fit: contain; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: block; }
+.cover-foreground-wrap { position: relative; z-index: 3; display: flex; align-items: center; justify-content: center; width: 100%; padding: 0.6rem; box-sizing: border-box; }
+.cover-foreground { height: 44%; max-height: 44%; width: auto; object-fit: contain; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: block; opacity: 0; transform: translateY(6px); transition: opacity 340ms ease, transform 340ms ease; }
+.cover-foreground.loaded { opacity: 1; transform: translateY(0); }
+
+/* overlay between blurred bg and foreground to increase contrast */
+.cover-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.35)); z-index: 1; }
 
 /* When image not yet loaded, keep skeleton overlay visible and sized */
-.img-wrap .skeleton { position: absolute; inset: 0; z-index: 1; }
+.img-wrap .skeleton { position: absolute; inset: 0; z-index: 4; }
+
+/* Pagination styles */
+.pagination { display: flex; gap: 1rem; align-items: center; justify-content: center; margin: 1.2rem 0; }
+.page-btn { background: #111; color: #fff; border: 1px solid #222; padding: 0.5rem 0.9rem; border-radius: 8px; cursor: pointer; }
+.page-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.page-list { color: #d0d0d0; font-size: 0.95rem; }
 .cover { 
   width: 100%; 
   height: 100%; 

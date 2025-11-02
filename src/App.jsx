@@ -10,12 +10,15 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
+  const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [platforms, setPlatforms] = useState({ pc: false, playstation: false, xbox: false });
   const [sortBy, setSortBy] = useState('rating');
   const [showTable, setShowTable] = useState(false);
 
-  const fetchGames = async () => {
+  const fetchGames = async (p = page) => {
     setLoading(true);
     setError(null);
     try {
@@ -29,11 +32,14 @@ const App = () => {
 
       const platformParam = platformIds.length ? `&parent_platforms=${platformIds.join(',')}` : '';
       const searchParam = searchQuery ? `&search=${searchQuery}` : '';
-      const url = `${baseUrl}/games?key=${apiKey}&page_size=20${searchParam}${platformParam}`;
+  const url = `${baseUrl}/games?key=${apiKey}&page=${p}&page_size=${pageSize}${searchParam}${platformParam}`;
 
       const response = await fetch(url);
       if (!response.ok) throw new Error('API error');
-      const { results } = await response.json();
+  const data = await response.json();
+  const { results, count } = data;
+  // Compute total pages from count and pageSize if available
+  if (typeof count === 'number') setTotalPages(Math.max(1, Math.ceil(count / pageSize)));
       
       // Transform data
       const transformed = results.map(game => ({
@@ -58,12 +64,16 @@ const App = () => {
   };
 
   useEffect(() => {
-    fetchGames();
-  }, []); // Initial fetch
+    // Fetch whenever page changes
+    fetchGames(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetchGames();
+    // reset to first page when submitting a new search
+    setPage(1);
+    fetchGames(1);
   };
 
   const handlePlatformChange = (e) => {
@@ -157,6 +167,30 @@ const App = () => {
         ) : (
           <GameGrid games={games} openDetail={openDetail} />
         )}
+        {/* Pagination controls */}
+        <nav className="pagination" aria-label="Pagination">
+          <button
+            className="page-btn"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            aria-label="Previous page"
+          >
+            ‹ Prev
+          </button>
+
+          <div className="page-list" aria-hidden>
+            Page {page} / {totalPages}
+          </div>
+
+          <button
+            className="page-btn"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            aria-label="Next page"
+          >
+            Next ›
+          </button>
+        </nav>
         {selectedGame && (
           <GameDetail game={selectedGame} onClose={() => setSelectedGame(null)} />
         )}
