@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import SearchForm from './components/SearchForm';
 import GameGrid from './components/GameGrid';
@@ -11,14 +11,16 @@ const App = () => {
   const [error, setError] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(20);
   const [totalPages, setTotalPages] = useState(1);
+  const [infinite, setInfinite] = useState(false);
+  const bottomRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [platforms, setPlatforms] = useState({ pc: false, playstation: false, xbox: false });
   const [sortBy, setSortBy] = useState('rating');
   const [showTable, setShowTable] = useState(false);
 
-  const fetchGames = async (p = page) => {
+  const fetchGames = async (p = page, append = false) => {
     setLoading(true);
     setError(null);
     try {
@@ -55,7 +57,16 @@ const App = () => {
         return new Date(b.release_date) - new Date(a.release_date);
       });
 
-      setGames(sorted);
+      if (append) {
+        setGames((prev) => {
+          // avoid duplicates by id
+          const ids = new Set(prev.map((it) => it.id));
+          const filtered = sorted.filter((it) => !ids.has(it.id));
+          return [...prev, ...filtered];
+        });
+      } else {
+        setGames(sorted);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -64,16 +75,37 @@ const App = () => {
   };
 
   useEffect(() => {
-    // Fetch whenever page changes
-    fetchGames(page);
+    // Fetch whenever page changes. If infinite mode is enabled and page > 1, append results.
+    const append = infinite && page > 1;
+    fetchGames(page, append);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
+
+  // IntersectionObserver for infinite scroll
+  useEffect(() => {
+    if (!infinite) return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !loading && page < totalPages) {
+            setPage((p) => p + 1);
+          }
+        });
+      },
+      { root: null, rootMargin: '200px', threshold: 0.1 }
+    );
+    const el = bottomRef.current;
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, [infinite, loading, page, totalPages]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // reset to first page when submitting a new search
     setPage(1);
-    fetchGames(1);
+    // if infinite, clear existing games so results rebuild from page 1
+    if (infinite) setGames([]);
+    fetchGames(1, false);
   };
 
   const handlePlatformChange = (e) => {
@@ -167,8 +199,48 @@ const App = () => {
         ) : (
           <GameGrid games={games} openDetail={openDetail} />
         )}
+        {/* Controls: page-size selector, infinite-toggle and pagination (hidden when infinite) */}
+        <div className="results-controls-aux" style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', justifyContent: 'center', marginTop: '.6rem', flexWrap: 'wrap' }}>
+          <label style={{ color: '#d0d0d0' }}>
+            Page size:
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                const n = Number(e.target.value);
+                setPageSize(n);
+                setPage(1);
+                setGames([]);
+                fetchGames(1, false);
+              }}
+              className="page-size-select"
+              style={{ marginLeft: '0.4rem' }}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={40}>40</option>
+            </select>
+          </label>
+
+          <label style={{ color: '#d0d0d0', display: 'inline-flex', alignItems: 'center', gap: '.4rem' }}>
+            <input
+              type="checkbox"
+              checked={infinite}
+              onChange={(e) => {
+                const v = e.target.checked;
+                setInfinite(v);
+                setPage(1);
+                setGames([]);
+                // If enabling infinite, fetch first page and let observer load next pages
+                fetchGames(1, false);
+              }}
+            />
+            Infinite scroll
+          </label>
+        </div>
+
         {/* Pagination controls: numbered with sliding window */}
-        <nav className="pagination" aria-label="Pagination">
+        {!infinite && (
+          <nav className="pagination" aria-label="Pagination">
           <button
             className="page-btn"
             onClick={() => setPage(1)}
@@ -227,13 +299,17 @@ const App = () => {
           >
             »
           </button>
-        </nav>
+          </nav>
+        )}
+
+        {/* Sentinel for infinite scroll loading */}
+        {infinite && <div ref={bottomRef} className="scroll-sentinel" aria-hidden="true" />}
         {selectedGame && (
           <GameDetail game={selectedGame} onClose={() => setSelectedGame(null)} />
         )}
       </main>
       <footer>
-        <p>&copy; 2025 Game App</p>
+        <p>&copy; 2025 Kioku Games 123140155 </p>
       </footer>
     </div>
   );

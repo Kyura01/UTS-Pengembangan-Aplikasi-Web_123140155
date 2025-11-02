@@ -195,6 +195,12 @@ table img {
   .page-list { gap: 0.2rem; }
   .page-btn { padding: 0.35rem 0.5rem; }
 }
+
+/* Page size selector */
+.page-size-select { background: #0d0d0d; color: #fff; border: 1px solid #222; padding: 0.35rem; border-radius: 6px; }
+
+/* Infinite scroll sentinel - small, invisible box near bottom to trigger load */
+.scroll-sentinel { height: 1px; width: 100%; }
 .cover { 
   width: 100%; 
   height: 100%; 
