@@ -68,9 +68,19 @@ th {
   background-color: #2a2a2a;
 }
 
-img {
+/* table thumbnails only (prevent global image constraint from shrinking in-card covers) */
+table img {
   max-width: 100px;
   height: auto;
+}
+
+/* Ensure card cover and wrapper images fill their containers and are not constrained by any global rules */
+.cover, .img-wrap img {
+  max-width: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* Modal */
@@ -113,6 +123,11 @@ img {
   cursor: pointer;
 }
 
+/* Make cards uniform height and allow the cover to grow to fill space */
+.game-card {
+  height: 440px; /* desktop card height */
+}
+
 .game-card:focus,
 .game-card:hover {
   transform: translateY(-6px);
@@ -120,13 +135,32 @@ img {
   outline: 2px solid #2b6df6;
 }
 
-.cover-wrap { 
-  display: block; 
-  overflow: hidden; 
-  aspect-ratio: 3 / 4; 
-  min-height: 280px;
+.cover-wrap {
+  display: block;
+  overflow: hidden;
   background: linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.1) 100%);
+  /* allow the cover area to grow and fill available card space */
+  flex: 1 1 auto;
+  min-height: 220px;
 }
+
+/* Blurred background + centered foreground image styles */
+.img-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.cover-bg {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  filter: blur(10px) saturate(1.05) contrast(0.9);
+  transform: scale(1.06);
+  z-index: 0;
+}
+.cover-foreground-wrap { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; width: 100%; padding: 0.6rem; box-sizing: border-box; }
+.cover-foreground { height: 44%; max-height: 44%; width: auto; object-fit: contain; border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: block; }
+
+/* When image not yet loaded, keep skeleton overlay visible and sized */
+.img-wrap .skeleton { position: absolute; inset: 0; z-index: 1; }
 .cover { 
   width: 100%; 
   height: 100%; 
@@ -139,12 +173,14 @@ img {
   transform: scale(1.08);
 }
 
-.card-body { 
-  padding: 0.8rem; 
-  display: flex; 
-  flex-direction: column; 
+.card-body {
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
   gap: 0.4rem;
   background: linear-gradient(180deg, rgba(23,23,23,0.95) 0%, rgba(18,18,18,0.98) 100%);
+  /* keep card body at its natural height so cover fills the rest */
+  flex: 0 0 auto;
 }
 .game-title { 
   font-size: 1rem; 
@@ -214,6 +250,8 @@ img {
   .modal-grid { grid-template-columns: 1fr; }
   .cover-wrap { height: 160px; }
   .detail-cover { height: 200px; }
+  .game-card { height: auto; }
+  .cover-wrap { min-height: 180px; }
 }
 
 /* left column styling so it doesn't look empty when images have black/transparent space */

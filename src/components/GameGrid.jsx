@@ -4,15 +4,25 @@ import React, { useState } from 'react';
 const ImageWithPlaceholder = ({ src, alt, className = '' }) => {
   const [loaded, setLoaded] = useState(false);
   return (
-    <div className={`img-wrap ${className}`}> 
-      {!loaded && <div className="skeleton" aria-hidden="true" />}
-      <img
-        src={src}
-        alt={alt}
-        className={`cover ${loaded ? 'loaded' : 'loading'}`}
-        onLoad={() => setLoaded(true)}
-        loading="lazy"
+    <div className={`img-wrap ${className}`}>
+      {/* blurred background layer to fill the card area */}
+      <div
+        className="cover-bg"
+        style={{ backgroundImage: `url(${src})` }}
+        aria-hidden="true"
       />
+
+      {/* foreground centered image */}
+      <div className="cover-foreground-wrap">
+        {!loaded && <div className="skeleton" aria-hidden="true" />}
+        <img
+          src={src}
+          alt={alt}
+          className={`cover cover-foreground ${loaded ? 'loaded' : 'loading'}`}
+          onLoad={() => setLoaded(true)}
+          loading="lazy"
+        />
+      </div>
     </div>
   );
 };
