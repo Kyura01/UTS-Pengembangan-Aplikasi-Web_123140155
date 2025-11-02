@@ -1,35 +1,116 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import SearchForm from './components/SearchForm';
+import GameGrid from './components/GameGrid';
+import GameDetail from './components/GameDetail';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [platforms, setPlatforms] = useState({ pc: false, playstation: false, xbox: false });
+  const [sortBy, setSortBy] = useState('rating');
+
+  const fetchGames = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const platformIds = [];
+      if (platforms.pc) platformIds.push(4); // PC
+      if (platforms.playstation) platformIds.push(187); // PS5 sebagai contoh
+      if (platforms.xbox) platformIds.push(1); // Xbox One sebagai contoh
+
+      const platformParam = platformIds.length ? `&parent_platforms=${platformIds.join(',')}` : '';
+      const searchParam = searchQuery ? `&search=${searchQuery}` : '';
+      const url = `https://api.rawg.io/api/games?key=YOUR_API_KEY&page_size=20${searchParam}${platformParam}`;
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('API error');
+      const { results } = await response.json();
+      
+      // Transform data
+      const transformed = results.map(game => ({
+        ...game,
+        release_date: game.released || 'N/A',
+        rating: game.rating || 0,
+      }));
+
+      // Sort
+      const sorted = [...transformed].sort((a, b) => {
+        if (sortBy === 'rating') return b.rating - a.rating;
+        return new Date(b.release_date) - new Date(a.release_date);
+      });
+
+      setGames(sorted);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGames();
+  }, []); // Initial fetch
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    fetchGames();
+  };
+
+  const handlePlatformChange = (e) => {
+    const { name, checked } = e.target;
+    setPlatforms(prev => ({ ...prev, [name]: checked }));
+  };
+
+  const handleSortChange = (e) => {
+    setSortBy(e.target.value);
+  };
+
+  const openDetail = async (slug) => {
+    setLoading(true);
+    try {
+      const url = `https://api.rawg.io/api/games/${slug}?key=YOUR_API_KEY`;
+      const response = await fetch(url);
+      const data = await response.json();
+      setSelectedGame(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="app">
+      <header>
+        <h1>Game Database</h1>
+      </header>
+      <main>
+        <SearchForm
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          platforms={platforms}
+          handlePlatformChange={handlePlatformChange}
+          sortBy={sortBy}
+          handleSortChange={handleSortChange}
+          handleSubmit={handleSubmit}
+        />
+        {loading && <p aria-live="polite">Loading...</p>}
+        {error && <p aria-live="assertive">Error: {error}</p>}
+        <GameGrid games={games} openDetail={openDetail} />
+        {selectedGame && (
+          <GameDetail game={selectedGame} onClose={() => setSelectedGame(null)} />
+        )}
+      </main>
+      <footer>
+        <p>&copy; 2025 Game App</p>
+      </footer>
+    </div>
+  );
+};
 
-export default App
+export default App;
