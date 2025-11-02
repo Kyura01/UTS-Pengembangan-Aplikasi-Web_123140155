@@ -94,7 +94,7 @@ const App = () => {
   return (
     <div className="app">
       <header>
-        <h1>Game Database</h1>
+        <h1>Kioku Games</h1>
       </header>
       <main>
         <SearchForm

@@ -1,5 +1,21 @@
 // src/components/GameGrid.jsx
-import React from 'react';
+import React, { useState } from 'react';
+
+const ImageWithPlaceholder = ({ src, alt, className = '' }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className={`img-wrap ${className}`}> 
+      {!loaded && <div className="skeleton" aria-hidden="true" />}
+      <img
+        src={src}
+        alt={alt}
+        className={`cover ${loaded ? 'loaded' : 'loading'}`}
+        onLoad={() => setLoaded(true)}
+        loading="lazy"
+      />
+    </div>
+  );
+};
 
 const GameGrid = ({ games, openDetail }) => {
   return (
@@ -16,7 +32,7 @@ const GameGrid = ({ games, openDetail }) => {
             aria-label={`Open details for ${game.name}`}
           >
             <div className="cover-wrap">
-              <img src={game.background_image} alt={`${game.name} cover`} className="cover" />
+              <ImageWithPlaceholder src={game.background_image} alt={`${game.name} cover`} />
             </div>
             <div className="card-body">
               <h3 className="game-title">{game.name}</h3>
