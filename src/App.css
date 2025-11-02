@@ -97,8 +97,8 @@ img {
 /* Card grid for games */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.2rem;
   align-items: start;
 }
 
@@ -120,12 +120,63 @@ img {
   outline: 2px solid #2b6df6;
 }
 
-.cover-wrap { display: block; overflow: hidden; aspect-ratio: 16 / 9; min-height: 140px; }
-.cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cover-wrap { 
+  display: block; 
+  overflow: hidden; 
+  aspect-ratio: 3 / 4; 
+  min-height: 280px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.1) 100%);
+}
+.cover { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover;
+  display: block;
+  transform: scale(1.02); /* Slight scale to prevent edge gaps */
+  transition: transform 300ms ease;
+}
+.game-card:hover .cover {
+  transform: scale(1.08);
+}
 
-.card-body { padding: 0.6rem; display: flex; flex-direction: column; gap: 0.4rem; }
-.game-title { font-size: 0.95rem; margin: 0; color: #fff; }
-.meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: #bdbdbd; }
+.card-body { 
+  padding: 0.8rem; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.4rem;
+  background: linear-gradient(180deg, rgba(23,23,23,0.95) 0%, rgba(18,18,18,0.98) 100%);
+}
+.game-title { 
+  font-size: 1rem; 
+  margin: 0; 
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.meta { 
+  display: flex; 
+  justify-content: space-between; 
+  font-size: 0.85rem; 
+  color: #bdbdbd;
+  margin-top: 0.2rem;
+}
+
+/* Description skeleton loading */
+.description-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 0.5rem 0;
+}
+
+.skeleton-line {
+  height: 0.9rem;
+  border-radius: 4px;
+}
+
+.skeleton-line:nth-child(2) { width: 92%; }
+.skeleton-line:nth-child(3) { width: 88%; }
+.skeleton-line:nth-child(4) { width: 75%; }
 
 /* Ensure card body fills available space so cards align and don't appear empty */
 .game-card .card-body { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: space-between; }

@@ -5,8 +5,12 @@ const GameDetail = ({ game, onClose }) => {
   const [screenshots, setScreenshots] = useState([]);
   const [index, setIndex] = useState(0);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const startX = useRef(null);
+  const startTime = useRef(null);
+  const velocity = useRef(0);
   const viewportRef = useRef(null);
+  const autoplayTimerRef = useRef(null);
 
   useEffect(() => {
     let mounted = true;
@@ -48,18 +52,70 @@ const GameDetail = ({ game, onClose }) => {
   const next = () => setIndex((i) => Math.min(i + 1, Math.max(0, items.length - 1)));
 
   // Pointer/touch handlers for swipe support
+  // Handle autoplay
+  useEffect(() => {
+    const startAutoplay = () => {
+      if (!isAutoPlaying) return;
+      autoplayTimerRef.current = setInterval(() => {
+        setIndex(i => (i + 1) % items.length);
+      }, 5000); // Change image every 5 seconds
+    };
+
+    const stopAutoplay = () => {
+      if (autoplayTimerRef.current) {
+        clearInterval(autoplayTimerRef.current);
+        autoplayTimerRef.current = null;
+      }
+    };
+
+    startAutoplay();
+    return () => stopAutoplay();
+  }, [isAutoPlaying, items.length]);
+
   const onPointerDown = (e) => {
+    if (autoplayTimerRef.current) {
+      clearInterval(autoplayTimerRef.current);
+      setIsAutoPlaying(false);
+    }
     startX.current = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+    startTime.current = Date.now();
+    velocity.current = 0;
     viewportRef.current && viewportRef.current.setPointerCapture?.(e.pointerId);
+  };
+
+  const onPointerMove = (e) => {
+    if (!startX.current) return;
+    const currentX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+    const deltaX = currentX - startX.current;
+    const deltaTime = Date.now() - startTime.current;
+    velocity.current = deltaX / deltaTime; // pixels per millisecond
   };
 
   const onPointerUp = (e) => {
     const endX = e.clientX || (e.changedTouches && e.changedTouches[0]?.clientX) || 0;
     const dx = endX - (startX.current || 0);
-    const threshold = 50; // px
-    if (dx > threshold) prev();
-    else if (dx < -threshold) next();
+    const deltaTime = Date.now() - startTime.current;
+    
+    // Calculate final velocity (pixels per millisecond)
+    const finalVelocity = dx / deltaTime;
+    
+    // Thresholds for swipe detection
+    const distanceThreshold = 50; // px
+    const velocityThreshold = 0.5; // px/ms
+    const timeThreshold = 300; // ms
+
+    // Determine if swipe should trigger based on distance, velocity, and time
+    if (Math.abs(finalVelocity) > velocityThreshold && deltaTime < timeThreshold) {
+      // Fast swipe - use velocity direction
+      finalVelocity > 0 ? prev() : next();
+    } else if (Math.abs(dx) > distanceThreshold) {
+      // Slow swipe - use distance direction
+      dx > 0 ? prev() : next();
+    }
+
     startX.current = null;
+    startTime.current = null;
+    velocity.current = 0;
   };
 
   return (
@@ -74,7 +130,11 @@ const GameDetail = ({ game, onClose }) => {
                 className="carousel-viewport"
                 ref={viewportRef}
                 onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
+                onMouseEnter={() => setIsAutoPlaying(false)}
+                onMouseLeave={() => setIsAutoPlaying(true)}
+                style={{ touchAction: 'pan-y pinch-zoom' }}
               >
                 {!imgLoaded && <div className="skeleton carousel-skeleton" aria-hidden="true" />}
                 <img
@@ -108,7 +168,16 @@ const GameDetail = ({ game, onClose }) => {
             <p className="meta-line"><strong>Genres:</strong> {genres}</p>
             <hr />
             <div className="description">
-              <p>{game.description_raw || 'No description available.'}</p>
+              {game.description_raw ? (
+                <p>{game.description_raw}</p>
+              ) : (
+                <div className="description-skeleton">
+                  <div className="skeleton skeleton-line" />
+                  <div className="skeleton skeleton-line" />
+                  <div className="skeleton skeleton-line" />
+                  <div className="skeleton skeleton-line" style={{ width: '75%' }} />
+                </div>
+              )}
             </div>
           </div>
         </div>
