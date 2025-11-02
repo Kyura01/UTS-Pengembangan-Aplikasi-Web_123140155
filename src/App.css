@@ -7,6 +7,27 @@
   background-color: #121212;
 }
 
+/* Animated color-mutation background inspired by the attached starry gradient image */
+.app {
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(6,25,43,0.65), transparent 30%),
+              radial-gradient(1000px 500px at 90% 20%, rgba(12,45,76,0.55), transparent 28%),
+              linear-gradient(180deg, #051027 0%, #0b2a3f 35%, #07243a 60%, #081a2b 100%);
+  background-size: 200% 200%, 200% 200%, 100% 100%;
+  animation: bg-shift 18s ease-in-out infinite;
+}
+
+@keyframes bg-shift {
+  0% {
+    background-position: 0% 10%, 100% 0%, 0% 0%;
+  }
+  50% {
+    background-position: 100% 90%, 0% 100%, 0% 0%;
+  }
+  100% {
+    background-position: 0% 10%, 100% 0%, 0% 0%;
+  }
+}
+
 header {
   background-color: #1e1e1e;
   padding: 1rem;
@@ -201,6 +222,33 @@ table img {
 
 /* Infinite scroll sentinel - small, invisible box near bottom to trigger load */
 .scroll-sentinel { height: 1px; width: 100%; }
+
+/* Toggle switch styles for infinite scroll */
+.toggle-switch {
+  --track-w: 46px;
+  --track-h: 26px;
+  --thumb-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  user-select: none;
+}
+.toggle-switch input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle-ui { width: var(--track-w); height: var(--track-h); background: linear-gradient(180deg,#0f1720,#0b1116); border-radius: 999px; padding: 3px; display: inline-flex; align-items: center; box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), 0 6px 18px rgba(2,6,23,0.6); transition: background 220ms ease, box-shadow 220ms ease; }
+.toggle-ui .thumb { width: var(--thumb-size); height: var(--thumb-size); background: linear-gradient(180deg,#ffffff,#d9eafd); border-radius: 50%; transform: translateX(0); transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms; box-shadow: 0 4px 12px rgba(11,34,60,0.45); }
+.toggle-switch input:checked + .toggle-ui { background: linear-gradient(90deg,#2b6df6,#2b9df6); box-shadow: 0 10px 26px rgba(43,109,246,0.18); }
+.toggle-switch input:checked + .toggle-ui .thumb { transform: translateX(calc(var(--track-w) - var(--thumb-size) - 6px)); }
+.toggle-label { color: #d0d0d0; font-size: 0.95rem; }
+
+/* Make toggle keyboard-focus friendly */
+.toggle-switch input:focus + .toggle-ui { outline: 3px solid rgba(43,109,246,0.12); }
+
+/* Small responsive tweak */
+@media (max-width: 520px) {
+  .toggle-switch { gap: 0.4rem; }
+  .toggle-label { font-size: 0.9rem; }
+}
 .cover { 
   width: 100%; 
   height: 100%; 

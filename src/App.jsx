@@ -221,7 +221,7 @@ const App = () => {
             </select>
           </label>
 
-          <label style={{ color: '#d0d0d0', display: 'inline-flex', alignItems: 'center', gap: '.4rem' }}>
+          <label className="toggle-switch" style={{ color: '#d0d0d0', display: 'inline-flex', alignItems: 'center', gap: '.6rem' }}>
             <input
               type="checkbox"
               checked={infinite}
@@ -234,7 +234,10 @@ const App = () => {
                 fetchGames(1, false);
               }}
             />
-            Infinite scroll
+            <span className="toggle-ui" aria-hidden="true">
+              <span className="thumb" />
+            </span>
+            <span className="toggle-label">Infinite scroll</span>
           </label>
         </div>
 
