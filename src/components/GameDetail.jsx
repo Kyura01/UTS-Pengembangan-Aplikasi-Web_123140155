@@ -6,7 +6,9 @@ const GameDetail = ({ game, onClose }) => {
 
   useEffect(() => {
     const fetchScreenshots = async () => {
-      const url = `https://api.rawg.io/api/games/${game.slug}/screenshots?key=YOUR_API_KEY`;
+      const apiKey = import.meta.env.VITE_RAWG_API_KEY;
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      const url = `${baseUrl}/games/${game.slug}/screenshots?key=${apiKey}`;
       const response = await fetch(url);
       const { results } = await response.json();
       setScreenshots(results.map((shot) => shot.image));

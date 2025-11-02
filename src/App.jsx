@@ -18,14 +18,17 @@ const App = () => {
     setLoading(true);
     setError(null);
     try {
+    const apiKey = import.meta.env.VITE_RAWG_API_KEY; // Ambil dari .env
+    const baseUrl = import.meta.env.VITE_API_BASE_URL; // Ambil base URL dari .env
+
       const platformIds = [];
       if (platforms.pc) platformIds.push(4); // PC
-      if (platforms.playstation) platformIds.push(187); // PS5 sebagai contoh
-      if (platforms.xbox) platformIds.push(1); // Xbox One sebagai contoh
+      if (platforms.playstation) platformIds.push(187); // Ps5
+      if (platforms.xbox) platformIds.push(1); // Xbox 
 
       const platformParam = platformIds.length ? `&parent_platforms=${platformIds.join(',')}` : '';
       const searchParam = searchQuery ? `&search=${searchQuery}` : '';
-      const url = `https://api.rawg.io/api/games?key=YOUR_API_KEY&page_size=20${searchParam}${platformParam}`;
+      const url = `${baseUrl}/games?key=${apiKey}&page_size=20${searchParam}${platformParam}`;
 
       const response = await fetch(url);
       if (!response.ok) throw new Error('API error');
@@ -34,9 +37,10 @@ const App = () => {
       // Transform data
       const transformed = results.map(game => ({
         ...game,
-        release_date: game.released || 'N/A',
-        rating: game.rating || 0,
+        release_date: game.released || 'N/A',  // Dari "released"
+        rating: game.rating || 0,  // Dari "rating"
       }));
+// Lalu sort dan setGames(transformed);
 
       // Sort
       const sorted = [...transformed].sort((a, b) => {
@@ -73,7 +77,9 @@ const App = () => {
   const openDetail = async (slug) => {
     setLoading(true);
     try {
-      const url = `https://api.rawg.io/api/games/${slug}?key=YOUR_API_KEY`;
+      const apiKey = import.meta.env.VITE_RAWG_API_KEY;
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      const url = `${baseUrl}/games/${slug}?key=${apiKey}`;
       const response = await fetch(url);
       const data = await response.json();
       setSelectedGame(data);
