@@ -164,3 +164,79 @@ img {
 /* Example of combination selector and pseudo-class usage */
 section[aria-label="Game List"] .game-card:first-child .game-title { font-weight: 700; }
 button:hover, .game-card:active { opacity: 0.95; }
+
+/* Search form (modern, minimalist) */
+.search-controls { display: flex; flex-direction: column; gap: 0.6rem; }
+.search-row { display: flex; gap: 0.5rem; align-items: center; }
+.search-input {
+  flex: 1;
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #222;
+  background: #0d0d0d;
+  color: #fff;
+  outline: none;
+}
+.search-input:focus { box-shadow: 0 6px 18px rgba(43,109,246,0.12); border-color: #2b6df6; }
+.search-btn { padding: 0.55rem 0.9rem; border-radius: 999px; border: none; background: #2b6df6; color: #fff; cursor: pointer; }
+
+/* Filter chips */
+.filters { display: flex; gap: 0.5rem; align-items: center; }
+.filter-chip { display: inline-flex; align-items: center; }
+.filter-chip input { display: none; }
+.filter-chip span {
+  display: inline-block;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: #151515;
+  color: #d0d0d0;
+  border: 1px solid #222;
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease;
+}
+.filter-chip:hover span { transform: translateY(-3px); }
+.filter-chip input:checked + span { background: #2b6df6; color: #fff; border-color: rgba(43,109,246,0.6); }
+
+.sort-wrap { margin-left: auto; }
+.sort-select { padding: 0.45rem 0.6rem; background: #0e0e0e; color: #fff; border: 1px solid #222; border-radius: 6px; }
+
+/* Results control toggle (cards/table) */
+.results-controls { display: flex; align-items: center; gap: 1rem; justify-content: space-between; }
+.results-title { margin: 0; color: #fff; }
+.view-toggle { display: flex; gap: 0.5rem; }
+.toggle-btn {
+  padding: 0.45rem 0.8rem;
+  border-radius: 8px;
+  background: #111;
+  color: #d0d0d0;
+  border: 1px solid #222;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+.toggle-btn.active { background: #2b6df6; color: #fff; box-shadow: 0 8px 20px rgba(43,109,246,0.18); transform: translateY(-3px); }
+.toggle-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+
+@media (max-width: 700px) {
+  .search-row { flex-direction: column; align-items: stretch; }
+  .sort-wrap { margin-left: 0; }
+  .search-input { width: 100%; }
+}
+
+/* Carousel styles for GameDetail */
+.carousel { position: relative; display: flex; align-items: center; justify-content: center; }
+.carousel-viewport { width: 100%; max-height: 420px; overflow: hidden; border-radius: 8px; }
+.carousel-img { width: 100%; height: 360px; object-fit: cover; display: block; border-radius: 8px; }
+.carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+.carousel-btn.prev { left: 8px; }
+.carousel-btn.next { right: 8px; }
+.carousel-btn:hover { background: rgba(43,109,246,0.85); }
+
+.thumbs { margin-top: 0.7rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.thumb { background: transparent; border: 1px solid transparent; padding: 0; cursor: pointer; border-radius: 6px; overflow: hidden; }
+.thumb img { width: 80px; height: 50px; object-fit: cover; display: block; }
+.thumb.active { border-color: #2b6df6; box-shadow: 0 6px 18px rgba(43,109,246,0.12); transform: translateY(-3px); }
+
+@media (max-width: 768px) {
+  .carousel-img { height: 220px; }
+  .thumb img { width: 60px; height: 40px; }
+}

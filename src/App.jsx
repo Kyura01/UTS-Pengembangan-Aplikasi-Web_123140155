@@ -109,11 +109,24 @@ const App = () => {
         {loading && <p aria-live="polite">Loading...</p>}
         {error && <p aria-live="assertive">Error: {error}</p>}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-          <h2 style={{ margin: 0 }}>Results</h2>
-          <div>
-            <button onClick={() => setShowTable(prev => !prev)} aria-pressed={showTable}>
-              {showTable ? 'Show Cards' : 'Show Table'}
+        <div className="results-controls">
+          <h2 className="results-title">Results</h2>
+          <div className="view-toggle" role="tablist" aria-label="View toggle">
+            <button
+              className={`toggle-btn ${!showTable ? 'active' : ''}`}
+              onClick={() => setShowTable(false)}
+              role="tab"
+              aria-selected={!showTable}
+            >
+              Cards
+            </button>
+            <button
+              className={`toggle-btn ${showTable ? 'active' : ''}`}
+              onClick={() => setShowTable(true)}
+              role="tab"
+              aria-selected={showTable}
+            >
+              Table
             </button>
           </div>
         </div>

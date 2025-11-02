@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 const GameDetail = ({ game, onClose }) => {
   const [screenshots, setScreenshots] = useState([]);
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -20,12 +21,25 @@ const GameDetail = ({ game, onClose }) => {
       }
     };
     fetchScreenshots();
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') return onClose();
+      if (e.key === 'ArrowRight') setIndex((i) => Math.min(i + 1, Math.max(0, screenshots.length - 1)));
+      if (e.key === 'ArrowLeft') setIndex((i) => Math.max(i - 1, 0));
+    };
     window.addEventListener('keydown', onKey);
     return () => { mounted = false; window.removeEventListener('keydown', onKey); };
-  }, [game.slug, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game.slug]);
+
+  useEffect(() => { setIndex(0); }, [game.slug]);
 
   const genres = game.genres?.map((g) => g.name).join(', ') || 'N/A';
+
+  const current = screenshots.length ? screenshots[index] : game.background_image;
+
+  const prev = () => setIndex((i) => Math.max(i - 1, 0));
+  const next = () => setIndex((i) => Math.min(i + 1, Math.max(0, screenshots.length - 1)));
 
   return (
     <div className="modal-overlay" role="presentation" onClick={(e) => { if (e.target.classList.contains('modal-overlay')) onClose(); }}>
@@ -33,10 +47,24 @@ const GameDetail = ({ game, onClose }) => {
         <button className="close-btn" onClick={onClose} aria-label="Close">×</button>
         <div className="modal-grid">
           <div className="left">
-            <img src={game.background_image} alt={`${game.name} cover`} className="detail-cover" />
-            <div className="screenshots">
-              {screenshots.slice(0, 4).map((img, idx) => (
-                <img key={idx} src={img} alt={`Screenshot ${idx + 1}`} />
+            <div className="carousel">
+              <button className="carousel-btn prev" onClick={prev} aria-label="Previous">‹</button>
+              <div className="carousel-viewport">
+                <img src={current} alt={`${game.name} screenshot`} className="carousel-img" />
+              </div>
+              <button className="carousel-btn next" onClick={next} aria-label="Next">›</button>
+            </div>
+
+            <div className="thumbs">
+              {(screenshots.length ? screenshots : [game.background_image]).map((img, idx) => (
+                <button
+                  key={idx}
+                  className={`thumb ${idx === index ? 'active' : ''}`}
+                  onClick={() => setIndex(idx)}
+                  aria-label={`Show screenshot ${idx + 1}`}
+                >
+                  <img src={img} alt={`Thumb ${idx + 1}`} />
+                </button>
               ))}
             </div>
           </div>

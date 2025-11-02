@@ -11,48 +11,57 @@ const SearchForm = ({
   handleSubmit,
 }) => {
   return (
-    <form onSubmit={handleSubmit} aria-label="Search Form">
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Search games..."
-        required
-        pattern=".{3,}" // Minimal 3 char
-        title="Minimal 3 karakter"
-      />
-      <label>
+    <form onSubmit={handleSubmit} aria-label="Search Form" className="search-controls">
+      <div className="search-row">
         <input
-          type="checkbox"
-          name="pc"
-          checked={platforms.pc}
-          onChange={handlePlatformChange}
+          className="search-input"
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search games..."
+          aria-label="Search games"
         />
-        PC
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          name="playstation"
-          checked={platforms.playstation}
-          onChange={handlePlatformChange}
-        />
-        PlayStation
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          name="xbox"
-          checked={platforms.xbox}
-          onChange={handlePlatformChange}
-        />
-        Xbox
-      </label>
-      <select value={sortBy} onChange={handleSortChange}>
-        <option value="rating">Sort by Rating</option>
-        <option value="release">Sort by Release Date</option>
-      </select>
-      <button type="submit">Search</button>
+        <button type="submit" className="search-btn">Search</button>
+      </div>
+
+      <div className="filters" role="group" aria-label="Platform filters">
+        <label className="filter-chip">
+          <input
+            type="checkbox"
+            name="pc"
+            checked={platforms.pc}
+            onChange={handlePlatformChange}
+          />
+          <span>PC</span>
+        </label>
+
+        <label className="filter-chip">
+          <input
+            type="checkbox"
+            name="playstation"
+            checked={platforms.playstation}
+            onChange={handlePlatformChange}
+          />
+          <span>PlayStation</span>
+        </label>
+
+        <label className="filter-chip">
+          <input
+            type="checkbox"
+            name="xbox"
+            checked={platforms.xbox}
+            onChange={handlePlatformChange}
+          />
+          <span>Xbox</span>
+        </label>
+      </div>
+
+      <div className="sort-wrap">
+        <select value={sortBy} onChange={handleSortChange} className="sort-select">
+          <option value="rating">Sort by Rating</option>
+          <option value="release">Sort by Release Date</option>
+        </select>
+      </div>
     </form>
   );
 };
