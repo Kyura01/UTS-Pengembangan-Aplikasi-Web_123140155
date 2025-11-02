@@ -1,0 +1,8 @@
+Place screenshots of the web app in this directory.
+
+Recommended:
+- ss.doc/home.png
+- ss.doc/grid.png
+- ss.doc/detail.png
+
+If you prefer a single document, you may add a Word file named `ss.docx` here with the screenshots embedded.
